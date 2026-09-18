@@ -6,6 +6,9 @@ __pycache__/
 venv/
 env/
 
+# Downloaded datasets
+data/
+
 # Tool caches
 .pytest_cache/
 .mypy_cache/

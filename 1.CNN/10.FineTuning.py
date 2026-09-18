@@ -336,7 +336,7 @@ if __name__ == '__main__':
 
     model.load_state_dict(
         torch.load(
-             "best_finetune_model.pt",
+            "best_finetune_model.pt",
             map_location=device
         )
     )
