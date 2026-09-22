@@ -2,27 +2,26 @@ import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-# 증가하는 데이터 1000개
-up = torch.linspace(0, 1, 10).repeat(1000, 1)
+sequence_length = 100
+num_samples = 2000
 
-# 감소하는 데이터 1000개
-down = torch.linspace(1, 0, 10).repeat(1000, 1)
+# 전체 시퀀스는 랜덤값
+x = torch.randn(
+    num_samples,
+    sequence_length,
+    1
+)
 
-# 약간의 노이즈 추가
-up += torch.randn_like(up) * 0.05
-down += torch.randn_like(down) * 0.05
+# label은 0 또는 1
+y = torch.randint(
+    0,
+    2,
+    (num_samples,)
+)
 
-# 합치기
-x = torch.cat([up, down], dim=0)
+# 첫 번째 값에 정답을 심음
+x[:, 0, 0] = y.float()
 
-# label
-y = torch.cat([
-    torch.zeros(1000, dtype=torch.long),
-    torch.ones(1000, dtype=torch.long),
-])
-
-# RNN은 입력을 [Batch, Sequence, Feature] 형태로 받아야 하므로 차원 추가
-x = x.unsqueeze(-1)
 
 class SimpleRNN(nn.Module):
     def __init__(self):
@@ -57,7 +56,7 @@ dataset = TensorDataset(x, y)
 
 train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-for epoch in range(10):
+for epoch in range(20):
     model.train()
 
     total_loss = 0
@@ -92,3 +91,5 @@ for epoch in range(10):
         f"loss {train_loss:.4f}, "
         f"accuracy {train_accuracy:.2f}%"
     )
+
+

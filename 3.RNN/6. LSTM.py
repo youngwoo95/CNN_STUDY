@@ -2,40 +2,42 @@ import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-# 증가하는 데이터 1000개
-up = torch.linspace(0, 1, 10).repeat(1000, 1)
+sequence_length = 10
+num_samples = 2000
 
-# 감소하는 데이터 1000개
-down = torch.linspace(1, 0, 10).repeat(1000, 1)
+x = torch.zeros(
+    num_samples,
+    sequence_length,
+    1
+)
 
-# 약간의 노이즈 추가
-up += torch.randn_like(up) * 0.05
-down += torch.randn_like(down) * 0.05
+y = torch.randint(
+    0,
+    2,
+    (num_samples,)
+)
 
-# 합치기
-x = torch.cat([up, down], dim=0)
+x[:, 0, 0] = y.float() * 2 - 1
 
-# label
-y = torch.cat([
-    torch.zeros(1000, dtype=torch.long),
-    torch.ones(1000, dtype=torch.long),
-])
 
-# RNN은 입력을 [Batch, Sequence, Feature] 형태로 받아야 하므로 차원 추가
-x = x.unsqueeze(-1)
-
-class SimpleRNN(nn.Module):
+class SimpleLSTM(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.rnn = nn.RNN(
+        self.lstm = nn.LSTM(
             input_size=1,
-            hidden_size=16,
+            hidden_size=32,
             batch_first=True)
-        self.fc = nn.Linear(16, 2)
+        self.fc = nn.Linear(32, 2)
+
+          # Forget Gate Bias를 1로 초기화
+        for name, param in self.lstm.named_parameters():
+            if "bias" in name:
+                n = param.size(0)
+                param.data[n // 4:n // 2].fill_(1.0)
 
     def forward(self, x):
-        output, hidden = self.rnn(x)
+        output, (hidden, cell) = self.lstm(x)
 
         x = output[:, -1, :]
         x = self.fc(x)
@@ -46,7 +48,7 @@ device = torch.device(
     "cuda" if torch.cuda.is_available() else "cpu"
 )
 
-model = SimpleRNN().to(device)
+model = SimpleLSTM().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(
     model.parameters(),
@@ -57,7 +59,7 @@ dataset = TensorDataset(x, y)
 
 train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-for epoch in range(10):
+for epoch in range(50):
     model.train()
 
     total_loss = 0
@@ -92,3 +94,5 @@ for epoch in range(10):
         f"loss {train_loss:.4f}, "
         f"accuracy {train_accuracy:.2f}%"
     )
+
+

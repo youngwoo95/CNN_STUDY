@@ -92,3 +92,42 @@ for epoch in range(10):
         f"loss {train_loss:.4f}, "
         f"accuracy {train_accuracy:.2f}%"
     )
+
+
+model.eval()
+
+test_x = torch.tensor([
+    0.10, 0.20, 0.18, 0.30, 0.27,
+    0.42, 0.39, 0.55, 0.60, 0.58
+], dtype=torch.float32)
+
+test_x = test_x.unsqueeze(0).unsqueeze(-1)
+test_x = test_x.to(device)
+
+with torch.no_grad():
+    output = model(test_x)
+
+    probabilities = torch.softmax(
+        output,
+        dim=1
+    )
+
+    predicted = probabilities.argmax(dim=1)
+
+print("output:", output)
+print("probabilities:", probabilities)
+
+print(
+    f"증가 확률: "
+    f"{probabilities[0][0].item() * 100:.2f}%"
+)
+
+print(
+    f"감소 확률: "
+    f"{probabilities[0][1].item() * 100:.2f}%"
+)
+
+print(
+    "예측:",
+    "증가" if predicted.item() == 0 else "감소"
+)
