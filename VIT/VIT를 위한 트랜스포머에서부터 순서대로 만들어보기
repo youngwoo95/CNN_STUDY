@@ -1,0 +1,54 @@
+전체 흐름
+1. Scaled Dot-Product Attention
+   Q, K, V가 실제로 어떻게 Attention이 되는지 다시 구현
+2. Self-Attention 클래스
+   x → Q,K,V → Attention → output
+3. Multi-Head Attention
+   여러 개의 Attention Head를 병렬로 만들기
+4. Transformer Encoder Block
+   MultiHeadAttention + Residual + LayerNorm + MLP
+5. Positional Encoding
+   Transformer가 순서를 알 수 있게 위치 정보 추가
+6. 작은 Transformer 완성
+   이미지 말고 일반 토큰을 넣어서 Encoder 동작 확인
+7. 이미지를 Patch로 자르기
+   예를 들어 32×32 이미지를 4×4 Patch로 분할
+8. Patch Embedding
+   이미지 Patch를 Transformer의 Token으로 변환
+9. CLS Token + Position Embedding
+   여기서부터 본격적인 ViT 구조
+10. Vision Transformer 완성
+    Image → Patch → Transformer Encoder → CLS → Classification
+11. CIFAR-10으로 직접 학습
+    우리가 만든 ViT가 실제 이미지를 분류하는지 확인
+
+------------------------------------------
+Image
+  ↓
+┌─────────────────────┐
+│   Patch Embedding   │
+└─────────────────────┘
+  ↓
+[CLS] [Patch1] [Patch2] [Patch3] ...
+  ↓
++ Position Embedding
+  ↓
+┌───────────────────────────────┐
+│      Transformer Encoder      │
+│                               │
+│  Multi-Head Self-Attention    │
+│              ↓                │
+│      Add & LayerNorm          │
+│              ↓                │
+│            MLP                │
+│              ↓                │
+│      Add & LayerNorm          │
+└───────────────────────────────┘
+  ↓
+Transformer Encoder × N
+  ↓
+[CLS]
+  ↓
+Linear
+  ↓
+Cat / Dog / Car / ...

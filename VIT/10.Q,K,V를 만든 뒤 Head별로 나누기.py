@@ -1,0 +1,36 @@
+import torch
+import torch.nn as nn
+import math
+
+x = torch.tensor([
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [1.0, 1.0, 1.0, 0.0]
+])
+
+seq_len = x.shape[0] # 3
+d_model = x.shape[1] # 4
+num_heads = 2 # 2
+
+d_head = d_model // num_heads # 2
+
+
+W_q = nn.Linear(d_model, d_model, bias=False)
+W_k = nn.Linear(d_model, d_model, bias=False)
+W_v = nn.Linear(d_model, d_model, bias=False)
+
+Q = W_q(x)
+K = W_k(x)
+V = W_v(x)
+
+print(Q.shape)
+print(K.shape)
+print(V.shape)
+
+Q = Q.view(seq_len, num_heads, d_head)
+K = K.view(seq_len, num_heads, d_head)
+V = V.view(seq_len, num_heads, d_head)
+
+print(Q.shape)
+print(K.shape)
+print(V.shape)

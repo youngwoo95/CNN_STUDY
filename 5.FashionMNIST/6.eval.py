@@ -126,3 +126,20 @@ for epoch in range(epochs):
         f"Accuracy: {train_accuracy:.2f}%"
     )
 
+# 평가 모드
+model.eval()
+
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        outputs = model(images)
+
+        predicted = outputs.argmax(dim=1)
+
+        correct += (predicted == labels).sum().item()
+        total += labels.size(0)
+
+test_accuracy = correct / total * 100
+print(f"Test Accuracy: {test_accuracy:.2f}%")
