@@ -28,21 +28,29 @@ Q = Q.view(seq_len, num_heads, d_head)
 K = K.view(seq_len, num_heads, d_head)
 V = V.view(seq_len, num_heads, d_head)
 
+
+
 Q = Q.transpose(0,1) # Q.shape = [2, 3, 2] Head개수 = 2, 토큰 개수 = 3, d_head = 2
 K = K.transpose(0,1) # K.shape = [2, 3, 2] Head개수 = 2, 토큰 개수 = 3, d_head = 2
 V = V.transpose(0,1) # V.shape = [2, 3, 2] Head개수 = 2, 토큰 개수 = 3, d_head = 2
+print(Q.shape)
+
 
 scores = Q @ K.transpose(-2, -1)
+
+print(scores.shape)
 
 scores = scores / math.sqrt(d_head)
 
 attention = torch.softmax(scores, dim=-1)
+print(attention.shape)
 
 output = attention @ V
 
 output = output.transpose(0, 1)
+print(output.shape) # 3 2 2
 
 output = output.reshape(seq_len, d_model)
-
+#  3, 4
 print(output.shape)
-print(output)
+#print(output)
