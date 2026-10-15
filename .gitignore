@@ -8,6 +8,8 @@ env/
 
 # Downloaded datasets
 data/
+insects_10/
+pollinator-insects-dataset/
 
 # Tool caches
 .pytest_cache/
